@@ -9,7 +9,7 @@ $(document).ready(function() {
 		window.location.replace(targeturl);
 	} else if (window.location.href.indexOf("snkrsapp") != -1) {
 		sku = window.location.href.split("?snkrsapp=")[1]
-		targeturl = snkrs://product/'+sku
+		targeturl = 'snkrs://product/'+sku
 		window.location.replace(targeturl);
 	}
 })
