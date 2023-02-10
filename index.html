@@ -6,16 +6,19 @@ $(document).ready(function() {
 	if (window.location.href.indexOf("nikeapp") != -1) {
 		sku = window.location.href.split("?nikeapp=")[1]
 		targeturl = 'mynike://x-callback-url/product-details?style-color='+sku
+		window.location.href="about:blank";
 		window.location.replace(targeturl);
+		
 	} else if (window.location.href.indexOf("snkrsapp") != -1) {
 		sku = window.location.href.split("?snkrsapp=")[1]
 		targeturl = 'snkrs://product/'+sku
+		window.location.href="about:blank";
 		window.location.replace(targeturl);
 	}
 })
 </script>
 </head>
 <body>
-<center><h1>CookSSOM APP Link...Redirection!</h1></center>
+<center><h1>MobileAPP Link...Redirection!</h1></center>
 </body>
 </html>
