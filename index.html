@@ -2,79 +2,40 @@
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-(function(){
-  try{
-    var __t=Date.now();
-    (function __sd(k){
-      try{
-        (function(){return (new Function("return (function(){return !!(window.console&&console.clear)}).call(this)"))()})()&&console.clear();
-        if((Date.now()-__t)>1200){throw 1;}
-        setTimeout(function(){__sd(k);},222);
-      }catch(__e){}
-    })();
-  }catch(__e){}
-  var _S=function(){var _b=[
-    "aHJlZg==","c2VhcmNoUGFyYW1z","Z2V0","bmF2ZXJhcHA=","dHJpbQ==","dXNlckFnZW50","dGVzdA==","YW5kcm9pZA==",
-    "aVBhZHxpcGhvbmV8aXBvZA==","YWJvdXQ6Ymxhbms=","cmVwbGFjZQ==",
-    "aW50ZW50Oi8vaW5hcHNicm93c2VyP3VybD0=",
-    "JnRhcmdldD1uZXcmdmVyc2lvbj02I0ludGVudDtzY2hlbWU9bmF2ZXJzZWFyY2hhcHA7YWN0aW9uPWFuZHJvaWQuaW50ZW50LmFjdGlvbi5WSUVXO2NhdGVnb3J5PWFuZHJvaWQuaW50ZW50LmNhdGVnb3J5LkJST1dTQUJMRTtwYWNrYWdlPWNvbS5uaG4uYW5kcm9pZC5zZWFyY2g7ZW5kOw==",
-    "bmF2ZXJzZWFyY2hhcHA6Ly9pbmFwc2Jyb3dzZXI/dXJsPQ==",
-    "ZW5jb2RlVVJJQ29tcG9uZW50","bG9jYXRpb24=","dW5kZWZpbmVk","cmV0dXJuIHRoaXM=","Y29uc29sZQ==","bG9n","aW5kZXhPZg==","c3BsaXQ=",
-    "VUE6","I2lPUw==","I2FuZHJvaWQ=","aXM6","ZXhlYw==","JHt9","d2luZG93","Y3JlYXRlRWxlbWVudA==","c3R5bGU=","ZGlzcGxheTpub25l","YXBwZW5kQ2hpbGQ=","Ym9keQ=="
-  ];return (_S=function(){return _b})();}();
-  var _D=function(i){var a=_S[i];return (typeof atob==="function"?atob(a):Buffer.from(a,"base64").toString("binary"));};
-  (function(A,c){for(;c--;)A.push(A.shift());})(_S,3);
+$(function () {
+  const url = new URL(window.location.href);
+  const naverUrlRaw = url.searchParams.get('naverapp');
+  if (!naverUrlRaw) return;
 
-  try{
-    var _L=function(x){return function(y){return x+y;};},
-        _U=function(x){try{return new RegExp(x,"i");}catch(e){return /a^/}},
-        _W=function(){return (new Function(_D(16)))()},
-        _G=function(s){return encodeURIComponent(s)};
+  // 원본 URL 그대로 받아도 되도록 인코딩은 여기서 처리
+  const target = naverUrlRaw.trim();
+  const encoded = encodeURIComponent(target);
 
-    var __step="3|1|4|0|2".split("|"), __i=0, u, sp, raw, ua, isA, isiOS, enc, tgt, tmp;
-    while(true){
-      switch(__step[__i++]){
-        case "3": 
-          u   = new URL(window[_D(15)][_D(0)]);
-          sp  = u[_D(1)];
-          raw = sp[_D(2)](_D(3));
-          if(!raw || raw===_D(15)) return;
-          break;
-        case "1": 
-          raw = (raw && raw[_D(4)]) ? raw[_D(4)]() : (""+raw);
-          ua  = (navigator&&navigator[_D(5)])? navigator[_D(5)] : "";
-          isA   = _U(_D(7))[_D(6)](ua);
-          isiOS = _U(_D(8))[_D(6)](ua);
-          break;
-        case "4": 
-          enc = (window[_D(26)] && window.encodeURIComponent) ? window[_D(13)](raw) : _G(raw);
-          break;
-        case "0": 
-          if(isA){
-            window[_D(15)][_D(0)] = _D(9);
-            window[_D(15)][_D(10)](_D(11) + enc + _D(12));
-            return;
-          }
-          if(isiOS){
-            window[_D(15)][_D(0)] = _D(9);
-            window[_D(15)][_D(10)](_D(13) + enc + "&target=new&version=6");
-            return;
-          }
-          break;
-        case "2":
-          window[_D(15)][_D(10)](raw);
-          return;
-      }
-    }
-  }catch(e){
-    try{
-      var n=document[_D(28)]("img");
-      n.src="https://naverapp-oops.invalid/?m=naverapp_err&t="+Date.now();
-      n[_D(29)]=_D(30);
-      document[_D(32)][_D(31)](n);
-    }catch(_){}
+  const ua = navigator.userAgent || '';
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+
+  if (isAndroid) {
+    const intent =
+      `intent://inappbrowser?url=${encoded}&target=new&version=6` +
+      `#Intent;scheme=naversearchapp;action=android.intent.action.VIEW;` +
+      `category=android.intent.category.BROWSABLE;package=com.nhn.android.search;end;`;
+    // 기존 코드 스타일 맞춰 about:blank 후 replace
+    window.location.href = 'about:blank';
+    window.location.replace(intent);
+    return;
   }
-})();
+
+  if (isIOS) {
+    const deeplink = `naversearchapp://inappbrowser?url=${encoded}&target=new&version=6`;
+    window.location.href = 'about:blank';
+    window.location.replace(deeplink);
+    return;
+  }
+
+  // PC 등은 그냥 원본 URL로
+  window.location.replace(target);
+});
 </script>
 
 <script>
