@@ -19,32 +19,55 @@ function _0xa337(_0x1ff6a8,_0x108619){const _0x299612=_0x3b39();return _0xa337=f
 
         async function addToTuneCart(variantId, qty) {
             try {
-                // Shopify API로 직접 카트에 추가
-                const response = await fetch('https://tune.kr/cart/add.js', {
+                // 1. 먼저 카트 생성
+                const createCartResponse = await fetch('https://tuneglobal.myshopify.com/api/2023-07/graphql.json', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Shopify-Storefront-Access-Token': '9ba9c997e667855da0e96accf047b6b6'
                     },
                     body: JSON.stringify({
-                        items: [{
-                            id: variantId,
-                            quantity: parseInt(qty)
-                        }]
+                        operationName: 'CartCreate',
+                        variables: {
+                            input: {
+                                lines: [{
+                                    merchandiseId: `gid://shopify/ProductVariant/${variantId}`,
+                                    quantity: parseInt(qty)
+                                }]
+                            }
+                        },
+                        query: `
+                            mutation CartCreate($input: CartInput!) {
+                                cartCreate(input: $input) {
+                                    cart {
+                                        id
+                                        checkoutUrl
+                                        totalQuantity
+                                    }
+                                    userErrors {
+                                        field
+                                        message
+                                    }
+                                }
+                            }
+                        `
                     })
                 });
 
-                if (response.ok) {
-                    // 성공하면 결제 페이지로 리다이렉트
-                    window.location.href = 'https://tune.kr/checkout';
-                } else {
-                    throw new Error('카트 추가 실패');
-                }
+                const cartData = await createCartResponse.json();
                 
+                if (cartData.data?.cartCreate?.cart?.checkoutUrl) {
+                    // 성공하면 tune.kr 결제 페이지로 이동
+                    window.location.href = cartData.data.cartCreate.cart.checkoutUrl;
+                } else {
+                    throw new Error('Cart creation failed');
+                }
+
             } catch (error) {
-                console.error('CORS 오류 또는 API 실패:', error);
-                // CORS 문제가 있을 경우 fallback: URL 파라미터와 함께 리다이렉트
-                window.location.href = `https://tune.kr/cart/${variantId}:${qty}`;
+                console.error('GraphQL Error:', error);
+                // 실패하면 제품 페이지로 fallback
+                window.location.href = `https://tune.kr/products/adizero-evo-sl-women-ad251xsesn25?variant=${variantId}`;
             }
         }
 
